@@ -101,6 +101,9 @@
         }];
     } else {
         [manager setFlutterResult:result];
+        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9) {
+            manager.allowsBackgroundLocationUpdates = YES;
+        }
         [manager startUpdatingLocation];
     }
 }

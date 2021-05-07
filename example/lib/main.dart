@@ -15,9 +15,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Map<String, Object> _locationResult;
+   Map<String, Object>? _locationResult;
 
-  StreamSubscription<Map<String, Object>> _locationListener;
+   StreamSubscription<Map<String, Object>>? _locationListener;
 
   AmapLocationFlutterPlugin _locationPlugin = new AmapLocationFlutterPlugin();
 
@@ -44,6 +44,7 @@ class _MyAppState extends State<MyApp> {
     _locationListener = _locationPlugin
         .onLocationChanged()
         .listen((Map<String, Object> result) {
+          print(result);
       setState(() {
         _locationResult = result;
       });
@@ -56,7 +57,7 @@ class _MyAppState extends State<MyApp> {
 
     ///移除定位监听
     if (null != _locationListener) {
-      _locationListener.cancel();
+      _locationListener!.cancel();
     }
 
     ///销毁定位
@@ -174,11 +175,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> widgets = new List();
+    List<Widget> widgets = [];
     widgets.add(_createButtonContainer());
 
     if (_locationResult != null) {
-      _locationResult.forEach((key, value) {
+      _locationResult!.forEach((key, value) {
         widgets.add(_resultWidget(key, value));
       });
     }
