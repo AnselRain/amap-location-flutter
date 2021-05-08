@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:amap_location_flutter_plugin/amap_location_flutter_plugin.dart';
-import 'package:amap_location_flutter_plugin/amap_location_option.dart';
+import 'package:amap_flutter_location/amap_flutter_location.dart';
+import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() {
@@ -19,7 +19,7 @@ class _MyAppState extends State<MyApp> {
 
    StreamSubscription<Map<String, Object>>? _locationListener;
 
-  AmapLocationFlutterPlugin _locationPlugin = new AmapLocationFlutterPlugin();
+   AMapFlutterLocation _locationPlugin = new AMapFlutterLocation();
 
   @override
   void initState() {
@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     ///key的申请请参考高德开放平台官网说明<br>
     ///Android: https://lbs.amap.com/api/android-location-sdk/guide/create-project/get-key
     ///iOS: https://lbs.amap.com/api/ios-location-sdk/guide/create-project/get-key
-    AmapLocationFlutterPlugin.setApiKey(
+    AMapFlutterLocation.setApiKey(
         "28bd43ed17d636692c8803e9e0d246b2", "dfb64c0463cb53927914364b5c09aba0");
 
     ///iOS 获取native精度类型
@@ -105,7 +105,7 @@ class _MyAppState extends State<MyApp> {
       /// <li>[DesiredAccuracy.NearestTenMeters] 10米 </li>
       /// <li>[DesiredAccuracy.Kilometer] 1000米</li>
       /// <li>[DesiredAccuracy.ThreeKilometers] 3000米</li>
-      locationOption.desiredAccuracy = DesiredAccuracy.Best;
+      locationOption.desiredAccuracy = DesiredAccuracy.NearestTenMeters;
 
       ///设置iOS端是否允许系统暂停定位
       locationOption.pausesLocationUpdatesAutomatically = false;

@@ -25,9 +25,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  amap_location_flutter_plugin:
-    path: ../
+  #amap_location_flutter_plugin:
+ #   path: ../
 
+  amap_flutter_location: ^2.0.0
+  permission_handler: ^7.1.0
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
