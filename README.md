@@ -16,6 +16,12 @@ $ rm ios/Podfile
 $ flutter build ios
 ```
 
+### HOW TO USE
+```
+amap_flutter_location:
+    git:
+      url: https://github.com/AnselRain/amap-location-flutter.git
+```
 
 ### 在需要的定位功能的页面中引入定位Flutter插件的dart类
 ``` Dart
