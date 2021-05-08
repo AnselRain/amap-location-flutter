@@ -1,7 +1,7 @@
-#import "AmapLocationFlutterPlugin.h"
+#import "AMapFlutterLocationPlugin.h"
 #import <AMapFoundationKit/AMapFoundationKit.h>
 #import <AMapLocationKit/AMapLocationKit.h>
-#import "AmapFlutterStreamManager.h"
+#import "AMapFlutterStreamManager.h"
 
 @interface AMapFlutterLocationManager : AMapLocationManager
 
@@ -24,23 +24,23 @@
 
 @end
 
-@interface AmapLocationFlutterPlugin()<AMapLocationManagerDelegate>
+@interface AMapFlutterLocationPlugin()<AMapLocationManagerDelegate>
 @property (nonatomic, strong) NSMutableDictionary<NSString*, AMapFlutterLocationManager*> *pluginsDict;
 
 @end
 
-@implementation AmapLocationFlutterPlugin
+@implementation AMapFlutterLocationPlugin
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel
-                                     methodChannelWithName:@"amap_location_flutter_plugin"
+                                     methodChannelWithName:@"amap_flutter_location"
                                      binaryMessenger:[registrar messenger]];
-    AmapLocationFlutterPlugin* instance = [[AmapLocationFlutterPlugin alloc] init];
+    AMapFlutterLocationPlugin* instance = [[AMapFlutterLocationPlugin alloc] init];
     [registrar addMethodCallDelegate:instance channel:channel];
     
-    //AmapFlutterStreamHandler * streamHandler = [[AmapFlutterStreamHandler alloc] init];
-    FlutterEventChannel *eventChanel = [FlutterEventChannel eventChannelWithName:@"amap_location_flutter_plugin_stream" binaryMessenger:[registrar messenger]];
-    [eventChanel setStreamHandler:[[AmapFlutterStreamManager sharedInstance] streamHandler]];
+    //AMapFlutterStreamHandler * streamHandler = [[AMapFlutterStreamHandler alloc] init];
+    FlutterEventChannel *eventChanel = [FlutterEventChannel eventChannelWithName:@"amap_flutter_location_stream" binaryMessenger:[registrar messenger]];
+    [eventChanel setStreamHandler:[[AMapFlutterStreamManager sharedInstance] streamHandler]];
         
 }
 
@@ -72,20 +72,24 @@
             result(@NO);
         }
     }else if ([@"getSystemAccuracyAuthorization" isEqualToString:call.method]) {
-        if (@available(iOS 14.0, *)) {
-            [self getSystemAccuracyAuthorization:call result:result];
-        }
+        [self getSystemAccuracyAuthorization:call result:result];
     }else {
         result(FlutterMethodNotImplemented);
     }
 }
 
 - (void)getSystemAccuracyAuthorization:(FlutterMethodCall*)call result:(FlutterResult)result {
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000
     if (@available(iOS 14.0, *)) {
         AMapFlutterLocationManager *manager = [self locManagerWithCall:call];
         CLAccuracyAuthorization curacyAuthorization = [manager currentAuthorization];
         result(@(curacyAuthorization));
     }
+#else
+    if (result) {
+        result(@(0));//如果不是iOS14,则定位精度权限默认为高精度
+    }
+#endif
 }
 
 - (void)startLocation:(FlutterMethodCall*)call result:(FlutterResult)result
@@ -175,7 +179,7 @@
             [manager setDistanceFilter:distanceFilter.doubleValue];
         }
     }
-
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000
     if (@available(iOS 14.0, *)) {
         NSNumber *accuracyAuthorizationMode = call.arguments[@"locationAccuracyAuthorizationMode"];
         if (accuracyAuthorizationMode) {
@@ -193,6 +197,7 @@
             manager.fullAccuracyPurposeKey = fullAccuracyPurposeKey;
         }
     }
+#endif
 }
 
 - (void)destroyLocation:(FlutterMethodCall*)call
@@ -212,7 +217,7 @@
 
 - (void)handlePlugin:(NSString *)pluginKey location:(CLLocation *)location reGeocode:(AMapLocationReGeocode *)reGeocode error:(NSError *)error
 {
-    if (!pluginKey || ![[AmapFlutterStreamManager sharedInstance] streamHandler].eventSink) {
+    if (!pluginKey || ![[AMapFlutterStreamManager sharedInstance] streamHandler].eventSink) {
         return;
     }
     NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithCapacity:1];
@@ -282,7 +287,7 @@
         [dic setObject:error.description forKey:@"errorInfo"];
     }
     
-    [[AmapFlutterStreamManager sharedInstance] streamHandler].eventSink(dic);
+    [[AMapFlutterStreamManager sharedInstance] streamHandler].eventSink(dic);
     //NSLog(@"x===%f,y===%f",location.coordinate.latitude,location.coordinate.longitude);
 }
 

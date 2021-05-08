@@ -1,4 +1,4 @@
-package com.amap.location.amaplocationflutterplugin;
+package com.amap.flutter.location;
 
 import android.text.TextUtils;
 

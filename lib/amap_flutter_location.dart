@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'amap_location_option.dart';
 
-class AmapLocationFlutterPlugin {
-  static const String _CHANNEL_METHOD_LOCATION = "amap_location_flutter_plugin";
-  static const String _CHANNEL_STREAM_LOCATION =
-      "amap_location_flutter_plugin_stream";
+///高德定位Flutter插件入口类
+class AMapFlutterLocation {
+  static const String _CHANNEL_METHOD_LOCATION = "amap_flutter_location";
+  static const String _CHANNEL_STREAM_LOCATION = "amap_flutter_location_stream";
 
   static const MethodChannel _methodChannel =
       const MethodChannel(_CHANNEL_METHOD_LOCATION);
@@ -19,9 +19,9 @@ class AmapLocationFlutterPlugin {
       .asBroadcastStream()
       .map<Map<String, Object>>((element) => element.cast<String, Object>());
 
-  StreamController<Map<String, Object>> _receiveStream;
-  StreamSubscription<Map<String, Object>> _subscription;
-  String _pluginKey;
+  StreamController<Map<String, Object>>? _receiveStream;
+  StreamSubscription<Map<String, Object>>? _subscription;
+  String? _pluginKey;
 
   /// 适配iOS 14定位新特性，只在iOS平台有效
   Future<AMapAccuracyAuthorization> getSystemAccuracyAuthorization() async {
@@ -39,7 +39,7 @@ class AmapLocationFlutterPlugin {
   }
 
   ///初始化
-  AmapLocationFlutterPlugin() {
+  AMapFlutterLocation() {
     _pluginKey = DateTime.now().millisecondsSinceEpoch.toString();
   }
 
@@ -77,25 +77,69 @@ class AmapLocationFlutterPlugin {
   void destroy() {
     _methodChannel.invokeListMethod('destroy', {'pluginKey': _pluginKey});
     if (_subscription != null) {
-      _receiveStream.close();
-      _subscription.cancel();
+      _receiveStream?.close();
+      _subscription?.cancel();
       _receiveStream = null;
       _subscription = null;
     }
   }
 
   ///定位结果回调
+  ///
+  ///定位结果以map的形式透出，其中包含的key已经含义如下：
+  ///
+  /// `callbackTime`:回调时间，格式为"yyyy-MM-dd HH:mm:ss"
+  ///
+  /// `locationTime`:定位时间， 格式为"yyyy-MM-dd HH:mm:ss"
+  ///
+  /// `locationType`:  定位类型， 具体类型可以参考https://lbs.amap.com/api/android-location-sdk/guide/utilities/location-type
+  ///
+  /// `latitude`:纬度
+  ///
+  /// `longitude`:精度
+  ///
+  /// `accuracy`:精确度
+  ///
+  /// `altitude`:海拔, android上只有locationType==1时才会有值
+  ///
+  /// `bearing`: 角度，android上只有locationType==1时才会有值
+  ///
+  /// `speed`:速度， android上只有locationType==1时才会有值
+  ///
+  /// `country`: 国家，android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `province`: 省，android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `city`: 城市，android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `district`: 城镇（区），android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `street`: 街道，android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `streetNumber`: 门牌号，android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `cityCode`: 城市编码，android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `adCode`: 区域编码， android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `address`: 地址信息， android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `description`: 位置语义， android上只有通过[AMapLocationOption.needAddress]为true时才有可能返回值
+  ///
+  /// `errorCode`: 错误码，当定位失败时才会返回对应的错误码， 具体错误请参考：https://lbs.amap.com/api/android-location-sdk/guide/utilities/errorcode
+  ///
+  /// `errorInfo`: 错误信息， 当定位失败时才会返回
   Stream<Map<String, Object>> onLocationChanged() {
     if (_receiveStream == null) {
       _receiveStream = StreamController();
       _subscription = _onLocationChanged.listen((Map<String, Object> event) {
-        if (event != null && event['pluginKey'] == _pluginKey) {
+        if (event['pluginKey'] == _pluginKey) {
           Map<String, Object> newEvent = Map<String, Object>.of(event);
           newEvent.remove('pluginKey');
-          _receiveStream.add(newEvent);
+          _receiveStream?.add(newEvent);
         }
       });
     }
-    return _receiveStream.stream;
+    return _receiveStream!.stream;
   }
 }

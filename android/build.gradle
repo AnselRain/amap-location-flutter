@@ -1,5 +1,5 @@
-group 'com.amap.location.amaplocationflutterplugin'
-version '1.0-SNAPSHOT'
+group 'com.amap.flutter.amap_flutter_location'
+version '1.0'
 
 buildscript {
     repositories {
@@ -22,18 +22,15 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 16
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
         disable 'InvalidPackage'
     }
-
     dependencies {
-        implementation fileTree(dir: 'libs', include: ['*.jar'])
-//        compile 'com.amap.api:location:4.9.0'
+        compileOnly 'com.amap.api:location:4.9.0'
     }
 }
