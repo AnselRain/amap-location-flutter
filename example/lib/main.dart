@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:amap_flutter_location/amap_flutter_location.dart';
 import 'package:amap_flutter_location/amap_location_option.dart';
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() {
@@ -41,6 +41,7 @@ class _MyAppState extends State<MyApp> {
 
     ///注册定位结果监听
     _locationListener = _locationPlugin.onLocationChanged().listen((Map<String, Object> result) {
+      print(result);
       setState(() {
         _locationResult = result;
       });
